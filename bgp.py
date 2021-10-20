@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum, auto
-from typing import Iterator, Optional, Tuple
+from typing import Iterator, Optional, Tuple, Union
 
 
 class IpAddr:
@@ -53,6 +53,22 @@ class IpAddr:
 
     def __gt__(self, other: IpAddr) -> bool:
         return int(self) > int(other)
+
+    def __and__(self, other: Union[IpAddr, int]) -> IpAddr:
+        if isinstance(other, IpAddr):
+            return IpAddr(int(self) & int(other))
+        return IpAddr(int(self) & other)
+
+    def __lshift__(self, amt: int) -> IpAddr:
+        new_num = int(self) << amt
+        return IpAddr(new_num % IpAddr.MAX_NUM)
+
+    def __rshift__(self, amt: int) -> IpAddr:
+        new_num = int(self) >> amt
+        return IpAddr(new_num)
+
+    def __invert__(self) -> IpAddr:
+        return IpAddr(~int(self))
 
     def __bytes__(self) -> bytes:
         return self.octets()
@@ -117,6 +133,13 @@ class IpMask:
 
     def __int__(self) -> int:
         return self.num_network_bits
+
+    def __lshift__(self, amt: int) -> IpMask:
+        new_num = self.num_network_bits - amt
+        return IpMask(new_num)
+
+    def __rshift__(self, amt: int) -> IpMask:
+        return self << -amt
 
 
 class IpNet:
@@ -203,6 +226,12 @@ class IpNet:
         while curr <= self.max_addr():
             yield IpAddr(curr)
             curr += 1
+
+    def __lshift__(self, amt: int) -> IpNet:
+        return IpNet(self.addr, self.mask << amt)
+
+    def __rshift__(self, amt: int) -> IpNet:
+        return IpNet(self.addr, self.mask >> amt)
 
 
 class NetClass(Enum):
