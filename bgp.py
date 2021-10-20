@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum, auto
-from typing import Optional, Tuple
+from typing import Iterator, Optional, Tuple
 
 
 class IpAddr:
@@ -47,6 +47,12 @@ class IpAddr:
         if isinstance(other, int):
             return int(self) == other
         return False
+
+    def __lt__(self, other: IpAddr) -> bool:
+        return int(self) < int(other)
+
+    def __gt__(self, other: IpAddr) -> bool:
+        return int(self) > int(other)
 
     def __bytes__(self) -> bytes:
         return self.octets()
@@ -130,6 +136,14 @@ class IpNet:
         """The base Ip Address associated with this network."""
         return self.mask.apply(self._base)
 
+    def min_addr(self) -> IpAddr:
+        """Getter for the minimum (numerically) ip address within this network space."""
+        return self.addr
+
+    def max_addr(self) -> IpAddr:
+        """Getter for the maximum (numerically) ip address within this network space."""
+        return IpAddr(int(self.min_addr()) + self.num_hosts() - 1)
+
     def num_hosts(self) -> int:
         """Getter for the number of unique addresses within this network."""
         return pow(2, self.mask.num_host_bits)
@@ -183,6 +197,12 @@ class IpNet:
     def __len__(self) -> int:
         """The number of hosts in this network."""
         return self.num_hosts()
+
+    def __iter__(self) -> Iterator[IpAddr]:
+        curr = int(self.min_addr())
+        while curr <= self.max_addr():
+            yield IpAddr(curr)
+            curr += 1
 
 
 class NetClass(Enum):
