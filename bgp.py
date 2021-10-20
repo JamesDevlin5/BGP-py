@@ -13,10 +13,12 @@ class IpAddr:
     MAX_NUM = 0xFF_FF_FF_FF
     MIN_NUM = 0
 
+    __slots__ = ["num"]
+
     def __init__(self, num: int):
         if not IpAddr.MIN_NUM <= num <= IpAddr.MAX_NUM:
             raise ValueError("Can only store a value with 4-bytes!")
-        self._num = num
+        self.num = num
 
     @classmethod
     def from_octets(cls, octets: list[int]) -> IpAddr:
@@ -32,7 +34,7 @@ class IpAddr:
 
     def __int__(self) -> int:
         """The numerical, integer representation of this address object."""
-        return self._num
+        return self.num
 
     def octets(self) -> bytes:
         """Gets an array of four-bytes, representing the octets of this ip address."""
@@ -96,6 +98,8 @@ class IpMask:
     MAX_NUM = 32
     MIN_NUM = 0
 
+    __slots__ = ["_num_network_bits"]
+
     def __init__(self, num_network_bits: int):
         self.num_network_bits = num_network_bits
 
@@ -144,6 +148,8 @@ class IpMask:
 
 class IpNet:
     """An Ip Network; a collection of hosts identified by Ip Addresses."""
+
+    __slots__ = ["_base", "_mask"]
 
     def __init__(self, base: IpAddr, mask: IpMask):
         self._base = base
