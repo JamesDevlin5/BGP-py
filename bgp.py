@@ -218,7 +218,7 @@ class IpNet:
         return other.is_supernet(self)
 
     def __eq__(self, other: IpNet) -> bool:
-        return self.addr == other.addr
+        return self.addr == other.addr and self.mask == other.mask
 
     def __str__(self) -> str:
         return f"{str(self.addr)}/{self.mask.num_network_bits}"
