@@ -109,7 +109,6 @@ class IpMask:
 
 class IpNet:
     """An Ip Network; a collection of hosts identified by Ip Addresses."""
-
     def __init__(self, base: IpAddr, mask: IpMask):
         self._base = base
         self._mask = mask
@@ -176,7 +175,15 @@ class IpNet:
 
 
 class NetClass(Enum):
-    """An obselete format of Ip-class versioning, predating CIDR subnetting."""
+    """An obselete format of Ip-class versioning, predating CIDR subnetting.
+
+    Inclusion in each class is determined by the first octet:
+    A  |    0-127  |  0000_0000 - 0111_1111  |  0***_****  |
+    B  |  128-191  |  1000_0000 - 1011_1111  |  10**_****  |
+    C  |  192-223  |  1100_0000 - 1101_1111  |  110*_****  |
+    D  |  224-239  |  1110_0000 - 1110_1111  |  1110_****  |
+    E  |  240-255  |  1111_0000 - 1111_1111  |  1111_****  |
+    """
 
     A = auto()
     B = auto()
