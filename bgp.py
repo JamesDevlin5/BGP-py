@@ -48,6 +48,9 @@ class IpAddr:
             return int(self) == other
         return False
 
+    def __bytes__(self) -> bytes:
+        return self.octets()
+
     @classmethod
     def get_local_addr(cls) -> IpAddr:
         """Getter for the address used to communicate with the local network."""
@@ -106,9 +109,13 @@ class IpMask:
     def __eq__(self, other: IpMask) -> bool:
         return self.num_network_bits == other.num_network_bits
 
+    def __int__(self) -> int:
+        return self.num_network_bits
+
 
 class IpNet:
     """An Ip Network; a collection of hosts identified by Ip Addresses."""
+
     def __init__(self, base: IpAddr, mask: IpMask):
         self._base = base
         self._mask = mask
@@ -173,6 +180,10 @@ class IpNet:
     def __str__(self) -> str:
         return f"{str(self.addr)}/{self.mask.num_network_bits}"
 
+    def __len__(self) -> int:
+        """The number of hosts in this network."""
+        return self.num_hosts()
+
 
 class NetClass(Enum):
     """An obselete format of Ip-class versioning, predating CIDR subnetting.
@@ -215,3 +226,14 @@ class NetClass(Enum):
         if 224 <= octet <= 239:
             return NetClass.D
         return NetClass.E
+
+    def __str__(self) -> str:
+        if self == NetClass.A:
+            return "A"
+        if self == NetClass.B:
+            return "B"
+        if self == NetClass.C:
+            return "C"
+        if self == NetClass.D:
+            return "D"
+        return "E"
